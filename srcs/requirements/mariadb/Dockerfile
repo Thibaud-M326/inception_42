@@ -17,7 +17,6 @@
 #
 # # CMD ["tail", "-f", "/dev/null"]
 #
-###############
 
 FROM alpine:3.22
 

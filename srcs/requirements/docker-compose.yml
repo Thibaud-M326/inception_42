@@ -1,0 +1,11 @@
+services:
+  mariadb:
+    build: ./mariadb/
+    container_name: mariadb
+    environment:
+      WP_DATABASE: wp_database
+      WP_USER: wp_user
+      WP_PASSWORD: 
+    secrets:
+      - db_password
+

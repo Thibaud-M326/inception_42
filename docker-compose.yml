@@ -1,4 +1,0 @@
-services:
-  mariadb:
-    build: ./mariadb/
-    container_name: mariadb
