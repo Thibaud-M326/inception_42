@@ -3,9 +3,13 @@ services:
     build: ./mariadb/
     container_name: mariadb
     environment:
-      WP_DATABASE: wp_database
-      WP_USER: wp_user
-      WP_PASSWORD: 
+      MYSQL_WP_DATABASE: wp_database
+      MYSQL_WP_USER: wp_user
+      MYSQL_WP_PASSWORD_FILE: /run/secrets/mysql_wp_password.txt
     secrets:
-      - db_password
+      - mysql_wp_password
+
+secrets:
+  mysql_wp_password:
+    file: ../../secrets/mysql_wp_password.txt
 

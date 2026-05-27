@@ -4,7 +4,18 @@ set -e
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
 
-# Initialise seulement si la base n'existe pas encore
+get_secret() {
+  local secret_name=$1
+  local default_value=$2
+  if [ -f "/run/secrets/${secret_name}" ]; then
+    cat "/run/secrets/${secret_name}"
+  else
+    echo "$default_value"
+  fi
+}
+
+MYSQL_PASSWORD=$(get_secret "mysql_wp_password.txt" "wp_fallback_pass")
+
 if [ ! -d "/var/lib/mysql/mysql" ]; then
   mariadb-install-db --user=mysql --datadir=/var/lib/mysql
 fi
