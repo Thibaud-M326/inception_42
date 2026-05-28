@@ -11,9 +11,14 @@ services:
       - mysql_root_password
       - mysql_wp_password
 
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress
+    depends_on:
+      - mariadb
+
 secrets:
   mysql_root_password:
     file: ../secrets/mysql_root_password.txt
   mysql_wp_password:
     file: ../secrets/mysql_wp_password.txt
-
