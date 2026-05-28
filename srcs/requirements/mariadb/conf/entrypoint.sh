@@ -16,6 +16,10 @@ get_secret() {
 
 MYSQL_PASSWORD=$(get_secret "mysql_wp_password.txt" "wp_fallback_pass")
 
+if [ -f "$MYSQL_WP_PASSWORD" ]; then
+  MYSQL_WP_PASSWORD=$(cat "$MYSQL_WP_PASSWORD")
+fi
+
 if [ ! -d "/var/lib/mysql/mysql" ]; then
   mariadb-install-db --user=mysql --datadir=/var/lib/mysql
 fi
