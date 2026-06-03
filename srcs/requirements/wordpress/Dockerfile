@@ -10,7 +10,9 @@ RUN apk update && apk add --no-cache \
     php83-mysqli \
     php83-iconv \
     php83-mbstring \
+    iproute2-ss \
     bash \
+    fcgi \
     curl
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
@@ -18,9 +20,12 @@ RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli
     && mv wp-cli.phar /usr/local/bin/wp
 
 RUN echo "memory_limit=256M" >> /etc/php83/php.ini
+RUN sed -i 's/listen = 127.0.0.1:9000/listen = 9000/' /etc/php83/php-fpm.d/www.conf
 
 COPY ./conf/entrypoint.sh /tmp/entrypoint.sh
 RUN chmod +x /tmp/entrypoint.sh
+
+EXPOSE 9000
 
 ENTRYPOINT ["/tmp/entrypoint.sh"]
 
