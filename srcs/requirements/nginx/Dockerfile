@@ -10,12 +10,12 @@ ENV DOMAIN="thmaitre.42.fr"
 
 RUN  mkdir -p /etc/nginx/ssl/
 
-
 RUN openssl req -x509 -nodes -newkey rsa:4096 -days 3650 \
     -keyout /etc/nginx/ssl/$DOMAIN.key \
     -out /etc/nginx/ssl/$DOMAIN.crt \
     -sha256 \
-    -subj "/CN=$DOMAIN"
+    -subj "/CN=$DOMAIN" \
+    -addext "subjectAltName=DNS:$DOMAIN"
 
 
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf

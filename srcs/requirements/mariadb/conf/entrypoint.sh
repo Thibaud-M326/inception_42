@@ -1,16 +1,6 @@
 #!/bin/sh
 set -e
 
-get_secret() {
-	local secret_name=$1
-	local default_value=$2
-	if [ -f "/run/secrets/${secret_name}" ]; then
-		cat "/run/secrets/${secret_name}"
-	else
-		echo "$default_value"
-	fi
-}
-
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
 
