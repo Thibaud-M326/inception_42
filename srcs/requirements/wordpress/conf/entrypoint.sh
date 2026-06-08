@@ -3,9 +3,8 @@
 set -e
 
 LOCAL=$LOCAL
-WP_SITE_PATH=$WP_SITE_PATH
 WP_DB_HOST=$WP_DB_HOST
-WP_SITE_URL=$WP_SITE_URL
+DOMAIN_NAME=https://${DOMAIN_NAME}
 WP_SITE_TITLE=$WP_SITE_TITLE
 WP_DB_NAME=$(cat $WP_DB_NAME_FILE)
 WP_DB_USER=$(cat $WP_DB_USER_FILE)
@@ -19,6 +18,8 @@ WP_USER_EMAIL=$(cat $WP_USER_EMAIL_FILE)
 
 mkdir -p /var/www/wp_site
 
+echo ${DOMAIN_NAME}
+
 if [ ! -f /var/www/wp_site/wp-config.php ]; then
   wp core download --locale="$LOCAL"
 
@@ -28,7 +29,7 @@ if [ ! -f /var/www/wp_site/wp-config.php ]; then
     --dbhost="$WP_DB_HOST" \
     --allow-root
 
-  wp core install --url="$WP_SITE_URL" \
+  wp core install --url="$DOMAIN_NAME" \
     --title="$WP_SITE_TITLE" \
     --admin_user="$WP_ADMIN_NAME" \
     --admin_password="$WP_ADMIN_PASS" \

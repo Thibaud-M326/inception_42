@@ -27,9 +27,8 @@ services:
     restart: always
     environment:
       LOCAL: ${LOCAL}
-      WP_SITE_PATH: ${WP_SITE_PATH}
       WP_DB_HOST: ${WP_DB_HOST}
-      WP_SITE_URL: ${WP_SITE_URL}
+      DOMAIN_NAME: ${DOMAIN_NAME}
       WP_SITE_TITLE: ${WP_SITE_TITLE}
       WP_DB_NAME_FILE: /run/secrets/mysql_wp_database
       WP_DB_USER_FILE: /run/secrets/mysql_wp_user
