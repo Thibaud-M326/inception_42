@@ -45,6 +45,10 @@ if [ ! -f /var/www/wp_site/wp-config.php ]; then
   echo "user ${user_name} created"
 fi
 
+//chamger l url de redirection de nginx, dans nginx.conf 	:	server_name thmaitre.42.fr;
+//https://blog.stephane-robert.info/docs/outils/projets/envsubst/
+//ensuite mettre a jour le DOMAINE name dans wp avec la cli
+
 echo "Install done!"
 
 exec php-fpm83 -F
