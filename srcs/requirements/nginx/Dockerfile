@@ -17,7 +17,6 @@ RUN openssl req -x509 -nodes -newkey rsa:4096 -days 3650 \
     -subj "/CN=$DOMAIN" \
     -addext "subjectAltName=DNS:$DOMAIN"
 
-
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 
 CMD ["nginx", "-g", "daemon off;"]
