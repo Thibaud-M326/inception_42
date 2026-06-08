@@ -5,9 +5,11 @@ mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld
 
 if [ ! -d "/var/lib/mysql/mysql" ]; then
-	mariadb-install-db --user=mysql --datadir=/var/lib/mysql
+  mariadb-install-db --user=mysql --datadir=/var/lib/mysql
 fi
 
+MYSQL_WP_DATABASE=$(cat $MYSQL_WP_DATABASE_FILE)
+MYSQL_WP_USER=$(cat $MYSQL_WP_USER_FILE)
 MYSQL_ROOT_PASSWORD=$(cat $MYSQL_ROOT_PASSWORD_FILE)
 MYSQL_WP_PASSWORD=$(cat $MYSQL_WP_PASSWORD_FILE)
 

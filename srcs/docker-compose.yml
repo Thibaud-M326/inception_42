@@ -4,8 +4,8 @@ services:
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_WP_DATABASE: ${MYSQL_WP_DATABASE}
-      MYSQL_WP_USER: ${MYSQL_WP_USER}
+      MYSQL_WP_DATABASE_FILE: /run/secrets/mysql_wp_database
+      MYSQL_WP_USER_FILE: /run/secrets/mysql_wp_user
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_password
       MYSQL_WP_PASSWORD_FILE: /run/secrets/mysql_wp_password
     volumes:
@@ -16,6 +16,8 @@ services:
       timeout: 2s
       retries: 10
     secrets:
+      - mysql_wp_database
+      - mysql_wp_user
       - mysql_root_password
       - mysql_wp_password
 
@@ -23,6 +25,31 @@ services:
     build: ./requirements/wordpress
     container_name: wordpress
     restart: always
+    environment:
+      LOCAL: ${LOCAL}
+      WP_SITE_PATH: ${WP_SITE_PATH}
+      WP_DB_HOST: ${WP_DB_HOST}
+      WP_SITE_URL: ${WP_SITE_URL}
+      WP_SITE_TITLE: ${WP_SITE_TITLE}
+      WP_DB_NAME_FILE: /run/secrets/mysql_wp_database
+      WP_DB_USER_FILE: /run/secrets/mysql_wp_user
+      WP_DB_PASS_FILE: /run/secrets/mysql_wp_password
+      WP_ADMIN_NAME_FILE: /run/secrets/wp_admin_name
+      WP_ADMIN_PASS_FILE: /run/secrets/wp_admin_pass
+      WP_ADMIN_EMAIL_FILE: /run/secrets/wp_admin_email
+      WP_USER_NAME_FILE: /run/secrets/wp_user_name
+      WP_USER_PASS_FILE: /run/secrets/wp_user_pass
+      WP_USER_EMAIL_FILE: /run/secrets/wp_user_email
+    secrets:
+      - mysql_wp_database
+      - mysql_wp_user
+      - mysql_wp_password
+      - wp_admin_name
+      - wp_admin_pass
+      - wp_admin_email
+      - wp_user_name
+      - wp_user_pass
+      - wp_user_email
     volumes:
       - wp_data:/var/www/wp_site
     depends_on:
@@ -51,6 +78,22 @@ secrets:
     file: ../secrets/mysql_root_password.txt
   mysql_wp_password:
     file: ../secrets/mysql_wp_password.txt
+  mysql_wp_database:
+    file: ../secrets/mysql_wp_database.txt
+  mysql_wp_user:
+    file: ../secrets/mysql_wp_user.txt
+  wp_admin_name:
+    file: ../secrets/wp_admin_name.txt
+  wp_admin_pass:
+    file: ../secrets/wp_admin_pass.txt
+  wp_admin_email:
+    file: ../secrets/wp_admin_email.txt
+  wp_user_name:
+    file: ../secrets/wp_user_name.txt
+  wp_user_pass:
+    file: ../secrets/wp_user_pass.txt
+  wp_user_email:
+    file: ../secrets/wp_user_email.txt
 
 volumes:
   db_data:

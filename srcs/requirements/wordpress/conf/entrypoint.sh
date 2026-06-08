@@ -2,35 +2,45 @@
 
 set -e
 
-locale="fr_FR"
-site_path="/var/www/wp_site/"
-db_name="wp_database"
-db_user="wp_user"
-#secret
-db_pass="motdepassdefou"
-db_host="mariadb"
-site_url="https://thmaitre.42.fr"
-site_title="mon site inception"
-#secret
-admin_user="thmaitrepanel"
-#secret
-admin_pass="thmaitrepanelpass"
-#secret
-admin_email="thmaitre@domaine.fr"
-
-user_name="lol_user"
-user_pass="lol_user_pass"
-user_email="lol@domaine.fr"
+LOCAL=$LOCAL
+WP_SITE_PATH=$WP_SITE_PATH
+WP_DB_HOST=$WP_DB_HOST
+WP_SITE_URL=$WP_SITE_URL
+WP_SITE_TITLE=$WP_SITE_TITLE
+WP_DB_NAME=$(cat $WP_DB_NAME_FILE)
+WP_DB_USER=$(cat $WP_DB_USER_FILE)
+WP_DB_PASS=$(cat $WP_DB_PASS_FILE)
+WP_ADMIN_NAME=$(cat $WP_ADMIN_NAME_FILE)
+WP_ADMIN_PASS=$(cat $WP_ADMIN_PASS_FILE)
+WP_ADMIN_EMAIL=$(cat $WP_ADMIN_EMAIL_FILE)
+WP_USER_NAME=$(cat $WP_USER_NAME_FILE)
+WP_USER_PASS=$(cat $WP_USER_PASS_FILE)
+WP_USER_EMAIL=$(cat $WP_USER_EMAIL_FILE)
 
 mkdir -p /var/www/wp_site
 
 if [ ! -f /var/www/wp_site/wp-config.php ]; then
-  wp core download --locale="$locale" --path="$site_path"
-  wp config create --dbname="$db_name" --dbuser="$db_user" --dbpass="$db_pass" --dbhost="$db_host" --path="$site_path" --allow-root
-  wp core install --url="$site_url" --title="$site_title" --admin_user="$admin_user" --admin_password="$admin_pass" --admin_email="$admin_email" --path="$site_path" --allow-root
-  echo "wp installation done"
+  wp core download --locale="$LOCAL"
 
-  wp user create ${user_name} ${user_email} --user_pass=${user_pass} --role=author --path=${site_path} --allow-root
+  wp config create --dbname="$WP_DB_NAME" \
+    --dbuser="$WP_DB_USER" \
+    --dbpass="$WP_DB_PASS" \
+    --dbhost="$WP_DB_HOST" \
+    --allow-root
+
+  wp core install --url="$WP_SITE_URL" \
+    --title="$WP_SITE_TITLE" \
+    --admin_user="$WP_ADMIN_NAME" \
+    --admin_password="$WP_ADMIN_PASS" \
+    --admin_email="$WP_ADMIN_EMAIL" \
+    --allow-root
+
+  echo "WordPress installation done"
+
+  wp user create $WP_USER_NAME $WP_USER_EMAIL \
+    --user_pass=$WP_USER_PASS \
+    --role=author --allow-root
+
   echo "user ${user_name} created"
 fi
 

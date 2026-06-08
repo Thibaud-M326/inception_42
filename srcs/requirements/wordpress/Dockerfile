@@ -27,5 +27,7 @@ RUN chmod +x /tmp/entrypoint.sh
 
 EXPOSE 9000
 
+WORKDIR /var/www/wp_site
+
 ENTRYPOINT ["/tmp/entrypoint.sh"]
 
