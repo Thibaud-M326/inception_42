@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
 
@@ -19,6 +19,8 @@ WP_USER_EMAIL=$(cat $WP_USER_EMAIL_FILE)
 mkdir -p /var/www/wp_site
 
 echo ${DOMAIN_NAME}
+
+mv /usr/bin/php83 /usr/bin/php
 
 if [ ! -f /var/www/wp_site/wp-config.php ]; then
   wp core download --locale="$LOCAL"
@@ -45,9 +47,15 @@ if [ ! -f /var/www/wp_site/wp-config.php ]; then
   echo "user ${user_name} created"
 fi
 
-//chamger l url de redirection de nginx, dans nginx.conf 	:	server_name thmaitre.42.fr;
-//https://blog.stephane-robert.info/docs/outils/projets/envsubst/
-//ensuite mettre a jour le DOMAINE name dans wp avec la cli
+wp option update siteurl ${DOMAIN_NAME}
+wp option update home ${DOMAIN_NAME}
+
+wp option get siteurl
+wp option get home
+
+#chamger l url de redirection de nginx, dans nginx.conf 	:	server_name thmaitre.42.fr;
+#https://blog.stephane-robert.info/docs/outils/projets/envsubst/
+#ensuite mettre a jour le DOMAINE name dans wp avec la cli
 
 echo "Install done!"
 

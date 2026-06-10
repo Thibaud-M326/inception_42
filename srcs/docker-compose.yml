@@ -14,12 +14,14 @@ services:
       test: ["CMD", "mariadb", "-u", "root", "-e", "USE wp_database;"]
       interval: 3s
       timeout: 2s
-      retries: 10
+      retries: 15
     secrets:
       - mysql_wp_database
       - mysql_wp_user
       - mysql_root_password
       - mysql_wp_password
+    networks:
+      - inception
 
   wordpress:
     build: ./requirements/wordpress
@@ -58,7 +60,9 @@ services:
       test: ["CMD", "cgi-fcgi", "-bind", "-connect", "localhost:9000"]
       interval: 3s
       timeout: 2s
-      retries: 10
+      retries: 15
+    networks:
+      - inception
 
   nginx:
     build: ./requirements/nginx
@@ -71,6 +75,8 @@ services:
         condition: service_healthy
     volumes:
       - wp_data:/var/www/wp_site
+    networks:
+      - inception
 
 secrets:
   mysql_root_password:
@@ -100,11 +106,14 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: /home/thmaitre--/data/mariadb_volume
+      device: /home/thmaitre/data/mariadb_volume
 
   wp_data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: /home/thmaitre--/data/wp_volume
+      device: /home/thmaitre/data/wp_volume
+
+networks:
+  inception:

@@ -1,7 +1,7 @@
-FROM alpine:3.22
+FROM alpine:3.23
 
 RUN apk update && apk add --no-cache \
-    php \
+    php83 \
     php83-fpm \
     php83-common \
     php83-phar \

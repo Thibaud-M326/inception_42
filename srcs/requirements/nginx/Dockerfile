@@ -1,4 +1,4 @@
-FROM alpine:3.22
+FROM alpine:3.23
 
 RUN apk add nginx
 RUN apk update && apk add --no-cache \
@@ -17,6 +17,7 @@ RUN openssl req -x509 -nodes -newkey rsa:4096 -days 3650 \
     -subj "/CN=$DOMAIN" \
     -addext "subjectAltName=DNS:$DOMAIN"
 
-COPY ./conf/nginx.conf /etc/nginx/nginx.conf
+RUN  mkdir -p /etc/nginx/conf.d/
+COPY ./conf/wp_nginx.conf /etc/nginx/http.d/
 
 CMD ["nginx", "-g", "daemon off;"]

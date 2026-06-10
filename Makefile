@@ -8,8 +8,8 @@ COMPOSE  = docker compose -f srcs/docker-compose.yml
 
 all:
 	@echo -e "$(GREEN)Building and starting containers...$(RESET)"
-	@mkdir -p /home/thmaitre--/data/mariadb_volume/
-	@mkdir -p /home/thmaitre--/data/wp_volume/
+	@mkdir -p /home/thmaitre/data/mariadb_volume/
+	@mkdir -p /home/thmaitre/data/wp_volume/
 	@$(COMPOSE) up --build -d
 	@echo -e "$(GREEN)Containers are up and running!$(RESET)"
 
@@ -55,8 +55,8 @@ clean: down
 
 fclean: clean
 	@echo -e "$(RED)Removing volumes data...$(RESET)"
-	@rm -rf /home/thmaitre--/data/mariadb_volume/*
-	@rm -rf /home/thmaitre--/data/wp_volume/*
+	@rm -rf /home/thmaitre/data/mariadb_volume/*
+	@rm -rf /home/thmaitre/data/wp_volume/*
 	@echo -e "$(RED)Volumes data removed.$(RESET)"
 
 .PHONY: all down re clean fclean
