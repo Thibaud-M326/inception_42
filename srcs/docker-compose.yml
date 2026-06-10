@@ -78,6 +78,13 @@ services:
     networks:
       - inception
 
+  adminer:
+    build: ./requirements/adminer
+    container_name: adminer
+    restart: always
+    networks:
+      - inception
+
 secrets:
   mysql_root_password:
     file: ../secrets/mysql_root_password.txt
