@@ -1,94 +1,101 @@
-# Documentation du projet
+# USER_DOC.md
 
-## Services fournis
+## Provided services
 
 ### Nginx
+- Web server that handles HTTP/HTTPS requests
+- Port 443 (HTTPS), and 80 (HTTP)
+- Routes and redirects traffic to WordPress, handles SSL certificates
 
-- Serveur web qui gere les requettes http/https
-- Port 443 (HTTPS), et 80 (HTTP)
-- Route et redirige le traffic vers wordpress, gere les certificats ssl
-
-### Wordpress
-
-- CMS, gestion de contenu
-- Acces grace au navigateur sur : https://thmaitre.42.fr
-- Administration du site, creation des pages, articles etc
+### WordPress
+- CMS, content management
+- Accessible through the browser at: https://thmaitre.42.fr
+- Site administration, creation of pages, articles, etc.
 
 ### MariaDB
-
-- Base de donnee relationnelle
-- Port 3306 (dans le reseaux virtuel docker)
-- Stockage des donnees de wordpress (user, article, commentaire)
+- Relational database
+- Port 3306 (inside the Docker virtual network)
+- Stores WordPress data (users, articles, comments)
 
 ---
 
-## Demarrage
+## Getting started
 
-|Commande|Action|
+|Command|Action|
 |---|---|
-|`make all`|Demarer les conteneurs|
-|`make down`|Arreter les conteneurs|
-|`make clean`|Nettoyage des conteneurs et des layers mis en cache|
-|`make fclean`|Supprime aussi les volumes (supprime les fichiers du site wordpress et toutes les donnees en base de donnee)|
+|`make all`|Start the containers|
+|`make down`|Stop the containers|
+|`make clean`|Clean up the containers and cached layers|
+|`make fclean`|Also removes the volumes (deletes the WordPress site files and all data in the database)|
 
 ---
 
-## Acces au site
+## Accessing the site
 
-| Lien                            | Description   |
+| Link                            | Description   |
 | ------------------------------- | ------------- |
-| https://thmaitre.42.fr          | Site          |
-| https://thmaitre.42.fr/wp-admin | Panneau admin |
+| https://${DOMAIN_NAME}          | Site          |
+| https://${DOMAIN_NAME}/wp-admin | Admin panel   |
 
-> **Notes :**
-> 
-> - Les certificats SSL auto signes peuvent generer un avertissement dans le navigateur (normal en phase de developpement)
-> - Accepter l'exception de securite pour continuer
-
----
-
-## Gestion des identifiants
-
-**Wordpress :** defini dans les secrets :
-
-- ///////////////////////////////// a finir ///////////////////////////
+> **Notes:**
+>
+> - Self-signed SSL certificates may trigger a warning in the browser (normal during the development phase)
+> - Accept the security exception to continue
 
 ---
 
-## Verification du fonctionnement des services
+## Credentials management
 
-Afficher l'etat des conteneurs apres lancement :
+**mysql:** defined in secrets/
+
+mysql_root_password.txt
+mysql_wp_database.txt
+mysql_wp_password.txt
+mysql_wp_user.txt
+
+wordpress: defined in secrets/
+
+wp_admin_email.txt
+wp_admin_name.txt
+wp_admin_pass.txt
+wp_user_email.txt
+wp_user_name.txt
+wp_user_pass.txt
+
+---
+
+## Checking that the services are working
+
+Display the state of the containers after startup:
 
 ```bash
 docker ps
 ```
 
-Consulter les logs :
+Check the logs:
 
 ```bash
-# Logs Nginx
+# Nginx logs
 make logs-nginx
-
-# Logs WordPress
+# WordPress logs
 make logs-wordpress
-
-# Logs MariaDB
+# MariaDB logs
 make logs-mariadb
 ```
 
-Test de connexion Nginx :
+Nginx connection test:
 
 ```bash
 curl -k https://thmaitre.42.fr
 ```
 
-> L'option `-k` permet d'ignorer les avertissements de certificat auto signe en dev
+> The `-k` option ignores self-signed certificate warnings in dev
 
-Test MariaDB :
+MariaDB test:
 
 ```bash
 make exec-mariadb
 mysql -u <wp user> -p <wordpress pass>
 ```
 
-> Les credentials sont stockes dans le dossier secret du projet
+> The credentials are stored in the project's secrets folder

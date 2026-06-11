@@ -1,150 +1,237 @@
-_this project has been created as part of the 42 curriculum by thmaitre_
+## Prerequisites
 
-# Description
+### Required software
 
-L objectif de se projet est de se plonger dans l univers passionant des container et de leur interaction, en effet docker est aujourd hui un incontournable.
-
-L utilite de Docker est principalement de pouvoir faire run des application sur n'importe quel machine, os ou architecture, en emulant des micro environement a l interieur de container.
-
-Une application est alors decoupee en micro service, chacun dans son container propre et communique entre eux grace a un reseaux prive a docker, puis disponible sur la machine host par port forwarding.
-
-Ce projet est accessile depuis une kvm (kernel virtual machine), soit une machine virtuelle d'hyperviseur type 1, soit un hyperviseur qui execute la virtualisation directement depuis le kernel, la ou un hyperviseur de type 2, serais une application execute depuis une application elle meme execute par dessus notre OS. Les performance d'une KVM sont proche des performance reelle de notre machine Hote.
-
-La mandatory inception nous demande de creer 3 conteneur relie entre eux dans un reseaux privee :
-
-- **MariaDb** : une base de donnee qui serviras a stocker les donne de Wordpress
-- **Wordpress + php fpm** : Creer et gerer un site web sans avoir besoin de coder : site vitrine, blog, boutique en ligne, portfolio. (CMS – Content Management System). Php fpm vas generer les pages statique depuis les requette redirige par nginx.
-- **Nginx** : Serveur web sert les fichier statique, sert de reverse proxy pour rediriger les requettes exterieur par des route configurable vers les application et services de nos conteneur, les page statique auront ete genere par php fpm dans le conteneur wordpress
-
-Pour la validation du projet il est necessaire de securiser la connexion avec https (port 443) avec des clef de certification pouvant etre auto genere pour le projet. Apres la configuration de nos docker, wordpress sera accessible : https://thmaitre.42.fr
+- **Docker**
+- **Docker Compose**
+- **Make**
+- **Git**
 
 ---
 
-# Instruction
+## Environment setup
 
-### Utilisation KVM
+### Step 1: Launch KVM
 
-Lancer la KVM :
+#headlesslaunch: launch without a graphical interface:
+qemu-system-x86_64 
+-enable-kvm 
+-m 3G 
+-smp 2 
+-cpu host 
+-hda ./vm-disk.qcow2 
+-display none 
+-daemonize 
+-netdev user,id=net0,hostfwd=tcp::2222-:22 
+-device virtio-net-pci,netdev=net0 
+-monitor tcp:127.0.0.1:4444,server,nowait 
+-virtfs local,path=/home/thmaitre/Documents/6_cercle/inception/alpine-shared,mount_tag=hostshare,security_model=mapped-xattr"
+
+or with the ~/.zshrc alias: myKvm
+
+#launch: launch with the XFCE graphical interface:
+qemu-system-x86_64 
+-enable-kvm 
+-m 3G 
+-smp 2 
+-cpu host 
+-hda ./vm-disk.qcow2 
+-display gtk 
+-daemonize 
+-netdev user,id=net0,hostfwd=tcp::2222-:22 
+-device virtio-net-pci,netdev=net0 
+-monitor tcp:127.0.0.1:4444,server,nowait 
+-virtfs local,path=/home/thmaitre/Documents/6_cercle/inception/alpine-shared,mount_tag=hostshare,security_model=mapped-xattr"
+
+or with the ~/.zshrc alias: myKvmGtk
+
+#close: shut down the KVM from the outside:
+echo \"system_powerdown\" | nc 127.0.0.1 4444"
+
+or with the ~/.zshrc alias: myKvmClose
+
+A bind folder, linked to /mnt/shared inside the KVM, is accessible from the host at the following path. It is only useful for
+editing the configuration; to launch the containers you must be inside the KVM:
 
 ```bash
-$ myKvm
+cd /home/thmaitre/Documents/6_cercle/inception/alpine-shared
 ```
 
-Connexion en ssh :
+You can also connect to the KVM via SSH if it is launched without a display:
 
 ```bash
-$ ssh root@localhost
+ssh root@localhost
 ```
+the root user's password is required
 
-Dossier partage avec Host, contenant le projet :
+or with another user:
+```bash
+ssh thmaitre@localhost
+```
+the thmaitre user's password is required
+
+### Step 2: Create the required directories
+
+The project uses Docker bind mounts to persist data on the host machine. Create the volume directories:
 
 ```bash
-cd /mtn/shared
+mkdir -p /home/thmaitre/data/mariadb_volume
+mkdir -p /home/thmaitre/data/wp_volume
 ```
 
-### Utilisation Docker
+The creation of these paths is defined in the Makefile with the rule: all
 
-Lancer les container Docker :
+### Step 3: Configure the secrets
+
+Secrets are stored in the `srcs/secrets/` directory.
 
 ```bash
-docker compose up -d --build
+mkdir -p srcs/secrets
 ```
 
-avec Makefile :
+
+| File                      | Role                                |
+| ------------------------- | ----------------------------------- |
+| `mysql_root_password.txt` | MariaDB root password               |
+| `mysql_wp_user.txt`       | WordPress database user             |
+| `mysql_wp_password.txt`   | WordPress database password         |
+| `mysql_wp_database.txt`   | WordPress database name             |
+| `wp_admin_name.txt`       | WordPress administrator username    |
+| `wp_admin_pass.txt`       | WordPress administrator password    |
+| `wp_admin_email.txt`      | WordPress administrator email       |
+| `wp_user_name.txt`        | WordPress username                  |
+| `wp_user_pass.txt`        | WordPress user password             |
+| `wp_user_email.txt`       | WordPress user email                |
+
+Never add secrets to git. Add `srcs/secrets/` to `.gitignore`.
+
+**Expected output:**
+```
+Building and starting containers...
+[+] Building 45.3s (25/25) FINISHED
+...
+Containers are up and running!
+```
+
+### Using Docker Compose
+
+Builds the containers in detached mode
 
 ```bash
-make
+docker compose -f srcs/docker-compose.yml up --build -d
 ```
 
-Fermer les conteneur :
+### Verify that the containers are running
 
 ```bash
-docker compose down
+docker ps
 ```
 
-avec Makefile :
+### Access the application
 
-```bash
-make down
-```
+- **HTTPS**: https://${DOMAIN_NAME}
 
-Autres commandes utiles :
-
-|Commande|Description|
-|---|---|
-|`docker logs [container]`|Afficher les logs|
-|`docker volume ls`|Lister les volumes|
-|`docker volume rm [volume]`|Supprimer un volume|
-|`docker exec -it [container] [shell]`|Entrer dans un container en ligne de commande|
+> **Note**: The application uses self-signed SSL certificates. Firefox's warning about self-signed certificates is normal. This is a development environment practice.
 
 ---
 
-# Ressources
+### Makefile commands
 
-|Sujet|Lien|
-|---|---|
-|Docker official documentation|https://docs.docker.com/|
-|Docker tutorial|https://blog.stephane-robert.info/docs/conteneurs/moteurs-conteneurs/docker/|
-|Alpine Linux|https://docs.alpinelinux.org/user-handbook/0.1a/index.html|
-|Alpine package manager|https://pkgs.alpinelinux.org/packages|
-|MariaDB - tuto installation Alpine Linux|https://linuxtricks.fr/wiki/alpine-linux-installer-et-configurer-un-serveur-de-base-de-donnees-mariadb|
-|Wordpress cli|https://fr.wordpress.org/cli/|
-|Nginx Official Documentation|https://nginx.org/en/docs/|
-|Nginx beginners guide|https://nginx.org/en/docs/beginners_guide.html|
-|Nginx configure https server|https://nginx.org/en/docs/http/configuring_https_servers.html|
+| Command       | Description                                                                                |
+| ------------- | ------------------------------------------------------------------------------------------ |
+| `make`        | Build and start the containers                                                              |
+| `make down`   | Stop and remove all containers                                                              |
+| `make re`     | Restart the containers (equivalent to `make down && make all`)                              |
+| `make clean`  | Stop the containers and remove all Docker images and dangling resources                    |
+| `make fclean` | Full cleanup: removes containers, images, AND all persistent volume data                   |
+
+### Container-specific commands
+
+**Open an interactive shell in a container:**
+
+```bash
+make exec-mariadb    # MariaDB container
+make exec-wordpress  # WordPress container
+make exec-nginx      # Nginx container
+```
+
+**Display container logs:**
+
+```bash
+make logs-mariadb    # MariaDB logs
+make logs-wordpress  # WordPress logs
+make logs-nginx      # Nginx logs
+```
+
+### Manual Docker commands
+
+**Show all containers:**
+```bash
+docker ps -a
+```
+
+**Show running containers:**
+```bash
+docker ps
+```
+
+**Stop all containers:**
+```bash
+docker compose -f srcs/docker-compose.yml down
+```
+
+**Start the containers (if already built):**
+```bash
+docker compose -f srcs/docker-compose.yml up -d
+```
+
+**Display logs of a specific container:**
+```bash
+docker logs -f container_name  # Follow the logs
+docker logs container_name     # Display historical logs
+```
+
+**Run a command in a running container:**
+```bash
+docker exec -it container_name command
+docker exec -it wordpress sh   # Open a shell in the WordPress container
+```
 
 ---
 
-# Project description
+## Data persistence
 
-Pour le projet inception j ai decide d optimiser et d utiliser les outils les plus leger possible afin de preserver les ressource de mon Host :
+### View persistent data
 
-- **KVM** : Alpine
-- **Docker** : Alpine
-
-### Virtual Machines vs Docker
-
-**Machine virtuelle :**
-
-Une machine virtuelle est une machine simule entierement, kernel, pilote materiel compris, il existe deux type de machine virtuelle. Les machines virtuelle sont gerer par un logiciel appele hyperviseur.
-
-- **Hyperviseur type 1** : tourne directement sur le kernel, optimise, les performances de la machine host et de la vm seront pratiquement equivalente, c'est la version optimise des machines virtuelle
-- **Hyperviseur type 2** : notre host possede un OS, qui lui vas faire tourner un logiciel hyperviseur, qui lui executera un machine virtuelle, beaucoup plus couteux en ressource.
-
-**Docker :**
-
-Docker a ete creer en 2013 par Solomon Hykes. Contrairement aux machine virtuelles, un conteneur Docker n'inclu pas de systeme d exploitation, elle s appuie sur des fonctionalite du systeme d exploitation fourni par le systeme hote. L avantage de Docker sera qu'il permet de creer des conteneur d'application isole les une des autres, et pouvant tourner sur toutes les machines de maniere legere, portable et flexible. AWS Amazon web service, utilise docker et kubernetes pour gerer la demande de connexion a votre server en genrant des container a la vole en fonction de la demande, sur un parc de machine differentes.
-
-### Secret vs variable d'environnement
-
-Tout deux des moyen de parametrer nos configuration docker avec des variables d environement.
-
-- **Secrets** : ne seront pas disponible dans les logs de notre container et represente une securite totale si nos container venais a etre attaque.
-- **Variables d'environnement classiques** : lisibles depuis l interieur du container et ne doivent jamais contenir de donnee sensible.
-
-> Evidement aucun de ces deux methode de stockage de variable ne doivent etre pousse sur un repo github.
-
-### Docker Network vs Host Network
-
-Lorsque Docker lance un ou plusieurs conteneur, il doit decider de la maniere avec laquelle les connecter aux reseaux.
-
-**Docker network (bridge) :**
-
-Docker va generer un reseaux virtuelle (docker0), les containeur et services pourront communiquer a l'interieur de ce reseaux et on peut faire du port forwarding pour rediriger un port de notre hote vers un port d'un de nos conteneur :
-
+**Check the database volume:**
 ```bash
-docker run -p 8080:80 nginx
+ls -la /home/thmaitre/data/mariadb_volume/
 ```
 
-Le traffic qui arrive sur 8080 sur notre machine hote vas etre redirige vers le port 80, utilise ici par nginx pour un connection http. On peut aussi creer nous meme nos propre sous reseaux personalise.
+**Check the WordPress volume:**
+```bash
+ls -la /home/thmaitre/data/wp_volume/
+```
 
-**Host network :**
+**Disk usage:**
+```bash
+du -sh /home/thmaitre/data/mariadb_volume/
+du -sh /home/thmaitre/data/wp_volume/
+```
 
-Ici le reseaux est directement partage avec notre machine hote, les application lancer dans des conteneur seront directement accessible depuis notre hote. Utile pour des application qui necessite une latence minimale. Pour du monitoring reseaux qui doivent observer tous les port de l'hote ou application qui ouvrent beaucoup de port, plus difficile a mapper. Le host network est moin safe que le bridge car il expose directement nos services sans isolation.
+### Delete the data
 
-### Docker volumes vs bind mounts
+**To delete all persistent data (full cleanup):**
+```bash
+make fclean
+```
 
-Servent a faire persister les donne en dehor des cycle de vie d un conteneur. Par default tous ce qu un conteneur ecrit dans son systeme de fichie est ephemere.
+**To list the volumes:**
+```bash
+docker volume ls
+```
 
-- **Bind mount** : les fichier sont synchronise en temp reel entre l hote et le container. Utile en phase de developpement.
-- **Docker volume** : Docker cree un espace de stockage dans son propre repertoire interne `/var/lib/docker/volumes/`. Cela rend les volume portable entres machines. Meilleur performance. Utilise en production / base de donnee.
+**To remove a volume:**
+```bash
+docker volume rm <volume name>
+```
