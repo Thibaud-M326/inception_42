@@ -13,7 +13,13 @@
 
 ### Step 1: Launch KVM
 
+To launch KVM, you must be at the location of the QEMU image :
+```bash
+cd /sgoingre
+```
+
 #headlesslaunch: launch without a graphical interface:
+
 qemu-system-x86_64 
 -enable-kvm 
 -m 3G 
@@ -30,6 +36,7 @@ qemu-system-x86_64
 or with the ~/.zshrc alias: myKvm
 
 #launch: launch with the XFCE graphical interface:
+
 qemu-system-x86_64 
 -enable-kvm 
 -m 3G 
@@ -46,6 +53,7 @@ qemu-system-x86_64
 or with the ~/.zshrc alias: myKvmGtk
 
 #close: shut down the KVM from the outside:
+
 echo \"system_powerdown\" | nc 127.0.0.1 4444"
 
 or with the ~/.zshrc alias: myKvmClose
@@ -54,7 +62,7 @@ A bind folder, linked to /mnt/shared inside the KVM, is accessible from the host
 editing the configuration; to launch the containers you must be inside the KVM:
 
 ```bash
-cd /home/thmaitre/Documents/6_cercle/inception/alpine-shared
+cd /home/thmaitre/Documents/6_cercle/inception/alpine-shared/
 ```
 
 You can also connect to the KVM via SSH if it is launched without a display:
@@ -133,7 +141,10 @@ docker ps
 
 > **Note**: The application uses self-signed SSL certificates. Firefox's warning about self-signed certificates is normal. This is a development environment practice.
 
+Error Code: MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT
+
 ---
+
 
 ### Makefile commands
 

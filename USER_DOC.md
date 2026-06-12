@@ -9,7 +9,7 @@
 
 ### WordPress
 - CMS, content management
-- Accessible through the browser at: https://thmaitre.42.fr
+- Accessible through the browser at: https://{DOMAIN_NAME}
 - Site administration, creation of pages, articles, etc.
 
 ### MariaDB
@@ -75,18 +75,15 @@ docker ps
 Check the logs:
 
 ```bash
-# Nginx logs
 make logs-nginx
-# WordPress logs
 make logs-wordpress
-# MariaDB logs
 make logs-mariadb
 ```
 
 Nginx connection test:
 
 ```bash
-curl -k https://thmaitre.42.fr
+curl -k https://${DOMAIN_NAME}
 ```
 
 > The `-k` option ignores self-signed certificate warnings in dev

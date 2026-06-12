@@ -24,7 +24,7 @@ To validate the project, the connection must be secured with HTTPS (port 443) us
 
 ### Using the KVM
 
-Start the KVM:
+Start the KVM inside /sgoinfre/:
 
 ```bash
 $ myKvm
@@ -50,7 +50,7 @@ Start the Docker containers:
 docker compose up -d --build
 ```
 
-with the Makefile:
+with Makefile:
 
 ```bash
 make
@@ -62,7 +62,7 @@ Stop the containers:
 docker compose down
 ```
 
-with the Makefile:
+with Makefile:
 
 ```bash
 make down
@@ -130,21 +130,27 @@ When Docker starts one or more containers, it has to decide how to connect them 
 
 **Docker network (bridge):**
 
-Docker generates a virtual network (docker0); containers and services can communicate inside this network, and we can use port forwarding to redirect a port from our host to a port of one of our containers:
+Docker generates a virtual network (docker0); containers and services can communicate inside this network, and we can use port forwarding to 
+redirect a port from our host to a port of one of our containers:
 
 ```bash
 docker run -p 8080:80 nginx
 ```
 
-Traffic arriving on port 8080 on our host machine will be redirected to port 80, used here by Nginx for an HTTP connection. We can also create our own custom subnetworks.
+Traffic arriving on port 8080 on our host machine will be redirected to port 80, used here by Nginx for an HTTP connection. We can also
+create our own custom subnetworks.
 
 **Host network:**
 
-Here the network is directly shared with our host machine; applications launched in containers will be directly accessible from our host. Useful for applications that require minimal latency, for network monitoring tools that need to observe all the host's ports, or for applications that open many ports, which are harder to map. The host network is less safe than the bridge because it directly exposes our services without isolation.
+Here the network is directly shared with our host machine; applications launched in containers will be directly accessible from our host.
+Useful for applications that require minimal latency, for network monitoring tools that need to observe all the host's ports, or for
+applications that open many ports, which are harder to map. The host network is less safe than the bridge because it directly exposes our
+services without isolation.
 
 ### Docker volumes vs bind mounts
 
 Used to persist data beyond a container's life cycle. By default, everything a container writes to its file system is ephemeral.
 
 - **Bind mount**: files are synchronized in real time between the host and the container. Useful during the development phase.
-- **Docker volume**: Docker creates a storage space in its own internal directory `/var/lib/docker/volumes/`. This makes volumes portable between machines. Better performance. Used in production / for databases.
+- **Docker volume**: Docker creates a storage space in its own internal directory `/var/lib/docker/volumes/`. This makes volumes portable
+between machines. Better performance. Used in production / for databases.

@@ -4,20 +4,12 @@ RUN apk add nginx
 RUN apk update && apk add --no-cache \
     nginx \
     iproute2-ss \
+    envsubst \
     openssl
 
-ENV DOMAIN="thmaitre.42.fr"
+COPY ./conf/wp_nginx.conf.template /tmp/wp_nginx.conf.template
+COPY ./conf/entrypoint.sh /tmp/entrypoint.sh
 
-RUN  mkdir -p /etc/nginx/ssl/
+RUN chmod +x /tmp/entrypoint.sh
 
-RUN openssl req -x509 -nodes -newkey rsa:4096 -days 3650 \
-    -keyout /etc/nginx/ssl/$DOMAIN.key \
-    -out /etc/nginx/ssl/$DOMAIN.crt \
-    -sha256 \
-    -subj "/CN=$DOMAIN" \
-    -addext "subjectAltName=DNS:$DOMAIN"
-
-RUN  mkdir -p /etc/nginx/conf.d/
-COPY ./conf/wp_nginx.conf /etc/nginx/http.d/
-
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/tmp/entrypoint.sh"]

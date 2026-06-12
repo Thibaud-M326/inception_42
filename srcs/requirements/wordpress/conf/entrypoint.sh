@@ -23,28 +23,28 @@ echo ${DOMAIN_NAME}
 mv /usr/bin/php83 /usr/bin/php
 
 if [ ! -f /var/www/wp_site/wp-config.php ]; then
-  wp core download --locale="$LOCAL"
+	wp core download --locale="$LOCAL"
 
-  wp config create --dbname="$WP_DB_NAME" \
-    --dbuser="$WP_DB_USER" \
-    --dbpass="$WP_DB_PASS" \
-    --dbhost="$WP_DB_HOST" \
-    --allow-root
+	wp config create --dbname="$WP_DB_NAME" \
+		--dbuser="$WP_DB_USER" \
+		--dbpass="$WP_DB_PASS" \
+		--dbhost="$WP_DB_HOST" \
+		--allow-root
 
-  wp core install --url="$DOMAIN_NAME" \
-    --title="$WP_SITE_TITLE" \
-    --admin_user="$WP_ADMIN_NAME" \
-    --admin_password="$WP_ADMIN_PASS" \
-    --admin_email="$WP_ADMIN_EMAIL" \
-    --allow-root
+	wp core install --url="$DOMAIN_NAME" \
+		--title="$WP_SITE_TITLE" \
+		--admin_user="$WP_ADMIN_NAME" \
+		--admin_password="$WP_ADMIN_PASS" \
+		--admin_email="$WP_ADMIN_EMAIL" \
+		--allow-root
 
-  echo "WordPress installation done"
+	echo "WordPress installation done"
 
-  wp user create $WP_USER_NAME $WP_USER_EMAIL \
-    --user_pass=$WP_USER_PASS \
-    --role=author --allow-root
+	wp user create $WP_USER_NAME $WP_USER_EMAIL \
+		--user_pass=$WP_USER_PASS \
+		--role=author --allow-root
 
-  echo "user ${user_name} created"
+	echo "user ${user_name} created"
 fi
 
 wp option update siteurl ${DOMAIN_NAME}
@@ -52,10 +52,6 @@ wp option update home ${DOMAIN_NAME}
 
 wp option get siteurl
 wp option get home
-
-#chamger l url de redirection de nginx, dans nginx.conf 	:	server_name thmaitre.42.fr;
-#https://blog.stephane-robert.info/docs/outils/projets/envsubst/
-#ensuite mettre a jour le DOMAINE name dans wp avec la cli
 
 echo "Install done!"
 
