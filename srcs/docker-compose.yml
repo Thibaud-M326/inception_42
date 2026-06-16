@@ -2,7 +2,7 @@ services:
   mariadb:
     build: ./requirements/mariadb/
     container_name: mariadb
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_WP_DATABASE_FILE: /run/secrets/mysql_wp_database
       MYSQL_WP_USER_FILE: /run/secrets/mysql_wp_user
@@ -26,7 +26,7 @@ services:
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
-    restart: always
+    restart: unless-stopped
     environment:
       LOCAL: ${LOCAL}
       WP_DB_HOST: ${WP_DB_HOST}
@@ -67,7 +67,7 @@ services:
   nginx:
     build: ./requirements/nginx
     container_name: nginx
-    restart: always
+    restart: unless-stopped
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
     ports:
